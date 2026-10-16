@@ -11,15 +11,20 @@ the delivery result.
 ## Install
 
 ```bash
-# from npm, once the first release is published
+# from the registry, once the first release is published
 npm install portcloud-notify
 
-# or from this repository today
-npm install ./typescript
+# from a checkout of this repository: the tarball is self-contained (dist/ included)
 npm pack ./typescript && npm install ./portcloud-notify-0.1.0.tgz
+
+# or link the directory (build it first: `npm --prefix ./typescript run build`)
+npm install ./typescript
 ```
 
-TypeScript types ship with the package (`dist/index.d.ts`). The package is ESM-only.
+npm does **not** support installing a package from a git subdirectory, so
+`npm install github:portcloud-labs/portcloud-notify-sdk#path:typescript` does not work —
+use the registry or a tarball. TypeScript types ship with the package
+(`dist/index.d.ts`), and the package is ESM-only.
 
 ## Quick start
 

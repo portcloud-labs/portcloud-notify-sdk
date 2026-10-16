@@ -174,3 +174,9 @@ except APIError as exc:
 ## Documentation
 
 Upstream API and console guides: <https://notify.portcloud.online/docs/>
+
+## License
+
+WTFPL — Do What The Fuck You Want To Public License, Version 2. The full text lives at
+<https://github.com/portcloud-labs/portcloud-notify-sdk/blob/main/LICENSE>, and the
+package metadata declares the SPDX identifier `WTFPL`.

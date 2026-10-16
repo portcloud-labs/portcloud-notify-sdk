@@ -51,6 +51,10 @@ Check the artifacts locally before tagging:
 python -m build --outdir dist python && python -m twine check dist/*
 ```
 
+## License
+
+WTFPL — Do What The Fuck You Want To Public License, Version 2. See [LICENSE](./LICENSE).
+
 API keys are created in the Portcloud console; channels and the send preset are account
 settings managed there, not by these SDKs. Sending consumes Message Credits, and a POST is
 never retried automatically because the API provides no idempotency key.

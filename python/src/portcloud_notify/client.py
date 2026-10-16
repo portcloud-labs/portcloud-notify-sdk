@@ -229,6 +229,7 @@ class Client:
             json_body=payload,
             send=True,
             parse=_parse_acceptance,
+            expected_status=201,
         )
 
     def send_preset(self, title: str, body: str) -> models.PresetSendAccepted:
@@ -246,6 +247,7 @@ class Client:
             json_body={"title": title, "body": body},
             send=True,
             parse=_parse_preset_acceptance,
+            expected_status=201,
         )
 
     def get_status(self, log_id: int) -> models.SendStatus:
@@ -254,6 +256,7 @@ class Client:
             "GET",
             f"/api/v1/send/{_require_positive_int(log_id)}",
             parse=models.SendStatus.from_dict,
+            expected_status=200,
         )
 
     def wait(
@@ -288,11 +291,13 @@ class Client:
 
     def me(self) -> models.Limits:
         """Account snapshot and Message Credits (``GET /api/v1/me``)."""
-        return self._request("GET", "/api/v1/me", parse=models.Limits.from_dict)
+        return self._request(
+            "GET", "/api/v1/me", parse=models.Limits.from_dict, expected_status=200
+        )
 
     def emails(self) -> list[str]:
         """Verified recipient addresses (``GET /api/v1/emails``)."""
-        return self._request("GET", "/api/v1/emails", parse=self._parse_emails)
+        return self._request("GET", "/api/v1/emails", parse=self._parse_emails, expected_status=200)
 
     def logs(
         self,
@@ -328,7 +333,9 @@ class Client:
             params["reason"] = reason
         if api_key_id is not None:
             params["api_key_id"] = api_key_id
-        return self._request("GET", "/api/v1/logs", params=params, parse=models.Page.from_dict)
+        return self._request(
+            "GET", "/api/v1/logs", params=params, parse=models.Page.from_dict, expected_status=200
+        )
 
     def stats_overview(self, range: str = "7d") -> models.Overview:
         """Account statistics (``GET /api/v1/stats/overview``)."""
@@ -339,6 +346,7 @@ class Client:
             "/api/v1/stats/overview",
             params={"range": range},
             parse=models.Overview.from_dict,
+            expected_status=200,
         )
 
     # ------------------------------------------------------------- internals
@@ -431,6 +439,7 @@ class Client:
         json_body: Optional[Mapping[str, Any]] = None,
         send: bool = False,
         parse: Optional[Callable[[Any], T]] = None,
+        expected_status: Optional[int] = None,
     ) -> Any:
         url = self.base_url + path
         if params:
@@ -447,6 +456,7 @@ class Client:
         request = urllib.request.Request(url, data=data, headers=headers, method=method)
         try:
             with self._opener.open(request, timeout=self.timeout) as response:
+                status = response.status
                 raw = response.read()
         except _RedirectRefusedError as exc:
             raise self._transport_error(
@@ -466,6 +476,15 @@ class Client:
             raise self._transport_error(
                 f"Request to {self.base_url} failed: {exc}", send=send
             ) from exc
+
+        if expected_status is not None and status != expected_status:
+            # A 2xx that is not the documented success status (a proxy or gateway
+            # answer) cannot be trusted as an acceptance or a result.
+            raise self._transport_error(
+                f"The service answered HTTP {status} instead of HTTP {expected_status}.",
+                http_status=status,
+                send=send,
+            )
 
         try:
             payload = json.loads(raw.decode("utf-8"))

@@ -2,7 +2,7 @@
 
 Synchronous Python client for the [Portcloud Notify](https://notify.portcloud.online/docs/)
 public HTTP API (`/api/v1/*`), which sends email and ntfy notifications. Distribution
-name `portcloud-notify`, import name `portcloud_notify`, version `0.1.0`, Python >= 3.9.
+name `portcloud-notify`, import name `portcloud_notify`, version `0.1.1`, Python >= 3.9.
 It uses only the standard library (`urllib`), so it has zero runtime dependencies.
 Sending is asynchronous: `send` and `send_preset` return an accepted `log_id`, and you
 poll for the delivery result.
@@ -103,7 +103,7 @@ Every exception derives from `PortcloudNotifyError`.
 | `ConfigurationError` | Local configuration missing/invalid. No request was sent. |
 | `NotificationsDisabledError` | Sending disabled by `PORTCLOUD_NOTIFY_ENABLED=0` or `enabled=False`. |
 | `TransportError` | No usable response (network failure, unparsable body). |
-| `AcceptanceUnknownError` (a `TransportError`) | A send POST may already have been queued: timeout, dropped connection, `408`, `5xx`, a redirect, or an unparsable acceptance body. |
+| `AcceptanceUnknownError` (a `TransportError`) | A send POST may already have been queued: timeout, dropped connection, `408`, `5xx`, a redirect, a 2xx that is not `201`, or an unparsable acceptance body. |
 | `PollTimeoutError` | `wait` gave up before a terminal state (`log_id`, `last_status`). |
 | `APIError` | The service's `{"error": {...}}` envelope. Base for the classes below. |
 | `ValidationError` | `400` / `422` — rejected before any delivery was queued. |

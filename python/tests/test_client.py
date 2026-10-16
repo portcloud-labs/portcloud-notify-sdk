@@ -36,7 +36,7 @@ PRESET_PATH = "/api/v1/send-preset"
 
 
 def test_send_posts_minimal_payload_and_headers(client: Client, service: MockService) -> None:
-    service.queued(payload={"log_id": 7, "status": "queued"})
+    service.queued(status=201, payload={"log_id": 7, "status": "queued"})
 
     accepted = client.send("email", "T", body="B")
 
@@ -53,7 +53,7 @@ def test_send_posts_minimal_payload_and_headers(client: Client, service: MockSer
 
 
 def test_send_email_html_with_target(client: Client, service: MockService) -> None:
-    service.queued(payload={"log_id": 8, "status": "queued"})
+    service.queued(status=201, payload={"log_id": 8, "status": "queued"})
 
     accepted = client.send("email", "T", html="<b>x</b>", to="a@b.c")
 
@@ -67,7 +67,7 @@ def test_send_email_html_with_target(client: Client, service: MockService) -> No
 
 
 def test_send_ntfy_with_target_has_no_html(client: Client, service: MockService) -> None:
-    service.queued(payload={"log_id": 9, "status": "queued"})
+    service.queued(status=201, payload={"log_id": 9, "status": "queued"})
 
     client.send("ntfy", "T", body="B", to="topic")
 
@@ -77,7 +77,7 @@ def test_send_ntfy_with_target_has_no_html(client: Client, service: MockService)
 
 
 def test_send_preset_posts_exact_payload(client: Client, service: MockService) -> None:
-    service.queued(payload={"log_id": 12, "preset_id": 3, "status": "queued"})
+    service.queued(status=201, payload={"log_id": 12, "preset_id": 3, "status": "queued"})
 
     accepted = client.send_preset("T", "B")
 

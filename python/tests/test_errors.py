@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from conftest import API_KEY, MockService
+from conftest import API_KEY, LIMITS_PAYLOAD, MockService
 from portcloud_notify import (
     AcceptanceUnknownError,
     APIError,
@@ -248,6 +248,40 @@ def test_send_success_body_that_is_not_json(client: Client, service: MockService
 
     with pytest.raises(AcceptanceUnknownError):
         client.send("email", "T", body="B")
+
+
+# ------------------------------------------------------------- success status
+
+
+@pytest.mark.parametrize("status", [200, 202])
+def test_send_accepts_only_201(client: Client, service: MockService, status: int) -> None:
+    service.queued(status=status, payload={"log_id": 7, "status": "queued"})
+
+    with pytest.raises(AcceptanceUnknownError) as excinfo:
+        client.send("email", "T", body="B")
+
+    error = excinfo.value
+    assert error.outcome_unknown is True
+    assert error.http_status == status
+
+
+def test_send_preset_accepts_only_201(client: Client, service: MockService) -> None:
+    service.queued(status=200, payload={"log_id": 7, "preset_id": 1, "status": "queued"})
+
+    with pytest.raises(AcceptanceUnknownError):
+        client.send_preset("T", "B")
+
+
+@pytest.mark.parametrize("status", [201, 202])
+def test_reads_require_200(client: Client, service: MockService, status: int) -> None:
+    service.queued(status=status, payload=LIMITS_PAYLOAD)
+
+    with pytest.raises(TransportError) as excinfo:
+        client.me()
+
+    error = excinfo.value
+    assert type(error) is TransportError
+    assert error.http_status == status
 
 
 # ------------------------------------------------------------------ transport

@@ -1,0 +1,47 @@
+{
+  "name": "portcloud-notify",
+  "version": "0.1.0",
+  "description": "JavaScript/TypeScript SDK for the Portcloud Notify public HTTP API (email and ntfy notifications).",
+  "license": "WTFPL",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "keywords": [
+    "portcloud",
+    "notify",
+    "notifications",
+    "email",
+    "ntfy",
+    "sdk",
+    "cloudflare-workers"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/portcloud-labs/portcloud-notify-sdk.git",
+    "directory": "typescript"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test \"test/**/*.test.mjs\"",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}

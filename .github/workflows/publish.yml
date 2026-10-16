@@ -1,15 +1,27 @@
 name: Publish
 
-# Publishes the Python SDK to PyPI with Trusted Publishing (OIDC): no API token is
-# stored in this repository. Configure the matching publisher on PyPI first — see
-# the "Releasing" section of README.md.
+# Publishes both SDKs whenever the release branch is updated (and on demand):
+# python/ to PyPI and typescript/ to npm, both with Trusted Publishing (OIDC), so no
+# registry token is stored in this repository. Configure the matching publisher on PyPI
+# and npm first — see the "Releasing" section of README.md.
+#
+# Re-publishing an existing version is a no-op: PyPI skips existing files and the npm job
+# checks the registry before publishing, so a release branch commit that does not bump a
+# version publishes nothing.
 on:
   push:
-    tags: ["v*"]
+    branches: [release]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
-  publish:
+  pypi:
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -38,3 +50,35 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist
+          skip-existing: true
+
+  npm:
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      id-token: write # required by npm Trusted Publishing
+    steps:
+      - uses: actions/checkout@v7
+
+      # Node 24 ships npm 11, which is required for Trusted Publishing.
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Test
+        working-directory: typescript
+        run: |
+          npm ci
+          npm test
+
+      - name: Publish to npm
+        working-directory: typescript
+        run: |
+          set -euo pipefail
+          version=$(node -p "require('./package.json').version")
+          if npm view "portcloud-notify@${version}" version >/dev/null 2>&1; then
+            echo "portcloud-notify@${version} is already published; nothing to do."
+            exit 0
+          fi
+          npm publish --provenance --access public

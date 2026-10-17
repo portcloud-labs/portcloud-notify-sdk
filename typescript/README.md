@@ -2,7 +2,7 @@
 
 ESM client for the [Portcloud Notify](https://notify.portcloud.online/docs/) public HTTP API
 (`/api/v1/*`), which sends email and ntfy notifications. Package `portcloud-notify`, version
-`0.1.0`, Node >= 22, Cloudflare Workers, and Bun. It has **no runtime dependencies**: the
+`0.1.1`, Node >= 22, Cloudflare Workers, and Bun. It has **no runtime dependencies**: the
 transport is the global `fetch`, which you can replace (Workers bindings, tests).
 
 Sending is asynchronous: `send` and `sendPreset` return an accepted `logId`, and you poll for
@@ -15,7 +15,7 @@ the delivery result.
 npm install portcloud-notify
 
 # from a checkout of this repository: the tarball is self-contained (dist/ included)
-npm pack ./typescript && npm install ./portcloud-notify-0.1.0.tgz
+npm pack ./typescript && npm install ./portcloud-notify-0.1.1.tgz
 
 # or link the directory (build it first: `npm --prefix ./typescript run build`)
 npm install ./typescript

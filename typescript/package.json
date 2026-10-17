@@ -1,6 +1,6 @@
 {
   "name": "portcloud-notify",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "JavaScript/TypeScript SDK for the Portcloud Notify public HTTP API (email and ntfy notifications).",
   "license": "WTFPL",
   "type": "module",

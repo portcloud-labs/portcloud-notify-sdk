@@ -11,7 +11,7 @@ the delivery result.
 ## Install
 
 ```bash
-# from the registry, once the first release is published
+# from the registry
 npm install portcloud-notify
 
 # from a checkout of this repository: the tarball is self-contained (dist/ included)
